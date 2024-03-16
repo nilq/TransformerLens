@@ -868,12 +868,12 @@ def convert_hf_model_config(model_name: str, **kwargs):
             "normalization_type": "RMS",
             "positional_embedding_type": "rotary",
             "window_size": hf_config.sliding_window,
-            "attn_types": ["local"] * hf_config.attention_heads,
+            "attn_types": ["local"] * hf_config.num_attention_heads,
             "eps": hf_config.rms_norm_eps,
             "n_key_value_heads": hf_config.num_key_value_heads,
             "gated_mlp": True,
             "use_local_attn": True,
-            "rotary_dim": hf_config.hidden_size // hf_config.attention_heads,
+            "rotary_dim": hf_config.hidden_size // hf_config.num_attention_heads,
         }
     elif architecture == "BloomForCausalLM":
         cfg_dict = {
