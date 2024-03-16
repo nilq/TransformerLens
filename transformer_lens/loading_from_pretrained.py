@@ -619,6 +619,10 @@ def get_official_model_name(model_name: str):
     """
     Returns the official model name for a given model name (or alias).
     """
+    if "nilq/" in model_name:
+        print("Hacking into the mainframe.")
+        return model_name
+
     model_alias_map = make_model_alias_map()
     official_model_name = model_alias_map.get(model_name.lower(), None)
     if official_model_name is None:
@@ -852,23 +856,24 @@ def convert_hf_model_config(model_name: str, **kwargs):
         }
     elif architecture == "MistralForCausalLM":
         cfg_dict = {
-            "d_model": 4096,
-            "d_head": 4096 // 32,
-            "n_heads": 32,
-            "d_mlp": 14336,
-            "n_layers": 32,
-            "n_ctx": 2048,  # Capped due to memory issues
-            "d_vocab": 32000,
+            "d_model": hf_config.hidden_size,
+            "d_head": hf_config.hidden_size // hf_config.num_attention_heads,
+            "n_heads": hf_config.num_attention_heads,
+            "d_mlp": hf_config.intermediate_size,
+            "n_layers": hf_config.num_hidden_layers,
+            "n_ctx": 2048, # Memory-capped.
+            "eps": hf_config.layer_norm_eps,
+            "d_vocab": hf_config.vocab_size,
             "act_fn": "silu",
             "normalization_type": "RMS",
             "positional_embedding_type": "rotary",
-            "window_size": 4096,
-            "attn_types": ["local"] * 32,
-            "eps": 1e-05,
-            "n_key_value_heads": 8,
+            "window_size": hf_config.sliding_window,
+            "attn_types": ["local"] * hf_config.attention_heads,
+            "eps": hf_config.rms_norm_eps,
+            "n_key_value_heads": hf_config.num_key_value_heads,
             "gated_mlp": True,
             "use_local_attn": True,
-            "rotary_dim": 4096 // 32,
+            "rotary_dim": hf_config.hidden_size // hf_config.attention_heads,
         }
     elif architecture == "BloomForCausalLM":
         cfg_dict = {
