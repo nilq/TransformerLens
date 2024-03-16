@@ -863,7 +863,6 @@ def convert_hf_model_config(model_name: str, **kwargs):
             "d_mlp": hf_config.intermediate_size,
             "n_layers": hf_config.num_hidden_layers,
             "n_ctx": 2048, # Memory-capped.
-            "eps": hf_config.layer_norm_eps,
             "d_vocab": hf_config.vocab_size,
             "act_fn": "silu",
             "normalization_type": "RMS",
